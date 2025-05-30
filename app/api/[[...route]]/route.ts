@@ -7,28 +7,28 @@ import {
   createMemo,
   updateMemo,
   deleteMemo,
-} from '@/lib/server';
+} from '@/lib/db';
 import { createMemoSchema, updateMemoSchema } from '@/schemas/memoschema';
 
 // Honoアプリケーションの作成
 const app = new Hono()
   // メモ一覧の取得
-  .get('/api/memos', (c) => {
-    const memos = getAllMemos();
+  .get('/api/memos', async (c) => {
+    const memos = await getAllMemos();
     return c.json({ memos });
   })
   
   // メモの作成
   .post('/api/memos', zValidator('json', createMemoSchema), async (c) => {
     const data = c.req.valid('json');
-    const memo = createMemo(data);
+    const memo = await createMemo(data);
     return c.json({ memo }, 201);
   })
   
   // メモの取得（ID指定）
-  .get('/api/memos/:id', (c) => {
+  .get('/api/memos/:id', async (c) => {
     const id = c.req.param('id');
-    const memo = getMemoById(id);
+    const memo = await getMemoById(id);
     
     if (!memo) {
       return c.json({ error: 'メモが見つかりません' }, 404);
@@ -41,7 +41,7 @@ const app = new Hono()
   .put('/api/memos/:id', zValidator('json', updateMemoSchema), async (c) => {
     const id = c.req.param('id');
     const data = c.req.valid('json');
-    const memo = updateMemo(id, data);
+    const memo = await updateMemo(id, data);
     
     if (!memo) {
       return c.json({ error: 'メモが見つかりません' }, 404);
@@ -51,9 +51,9 @@ const app = new Hono()
   })
   
   // メモの削除
-  .delete('/api/memos/:id', (c) => {
+  .delete('/api/memos/:id', async (c) => {
     const id = c.req.param('id');
-    const deleted = deleteMemo(id);
+    const deleted = await deleteMemo(id);
     
     if (!deleted) {
       return c.json({ error: 'メモが見つかりません' }, 404);

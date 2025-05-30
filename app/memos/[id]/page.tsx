@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { client } from '@/lib/hono';
 import type { Memo } from '@/lib/types';
+import { Button } from '@/components/ui/button';
 
 export default function MemoDetail({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -90,15 +91,17 @@ export default function MemoDetail({ params }: { params: Promise<{ id: string }>
         <div className="whitespace-pre-wrap mb-6">{memo.content}</div>
         
         <div className="flex space-x-4">
-          <Link href={`/memos/${memo.id}/edit`} className="bg-blue-500 text-white px-4 py-2 rounded">
-            編集
-          </Link>
-          <button
+          <Button asChild className="bg-blue-500 hover:bg-blue-600">
+            <Link href={`/memos/${memo.id}/edit`}>
+              編集
+            </Link>
+          </Button>
+          <Button
             onClick={handleDelete}
-            className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer"
+            className="bg-red-500 hover:bg-red-600 cursor-pointer"
           >
             削除
-          </button>
+          </Button>
         </div>
       </div>
     </div>

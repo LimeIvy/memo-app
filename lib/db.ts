@@ -1,15 +1,65 @@
-import { PrismaClient } from '@prisma/client' 
+'use server';
 
-const prismaClientSingleton = () => {
-  return new PrismaClient()
-}
+import { Memo, CreateMemoRequest, UpdateMemoRequest } from '@/lib/types';
+import db from '@/lib/prisma';
 
-declare const globalThis: {
-  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
-} & typeof global;
+// メモの取得（全件）
+export const getAllMemos = async (): Promise<Memo[]> => {
+  const memos = await db.memo.findMany();
+  return memos.map(memo => ({
+    ...memo,
+    createdAt: memo.createdAt.toISOString(),
+    updatedAt: memo.updatedAt.toISOString(),
+  }));
+};
 
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
+// メモの取得（ID指定）
+export const getMemoById = async (id: string): Promise<Memo | null> => {
+  const memo = await db.memo.findUnique({
+    where: { id },
+  });
+  return memo ? {
+    ...memo,
+    createdAt: memo.createdAt.toISOString(),
+    updatedAt: memo.updatedAt.toISOString(),
+  } : null;
+};
 
-export default prisma
+// メモの作成
+export const createMemo = async (data: CreateMemoRequest): Promise<Memo> => {
+  const newMemo = await db.memo.create({
+    data: {
+      title: data.title,
+      content: data.content,
+    },
+  });
+  return {
+    ...newMemo,
+    createdAt: newMemo.createdAt.toISOString(),
+    updatedAt: newMemo.updatedAt.toISOString(),
+  };
+};
 
-if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma
+// メモの更新
+export const updateMemo = async (id: string, data: UpdateMemoRequest): Promise<Memo | null> => {
+  const updatedMemo = await db.memo.update({
+    where: { id },
+    data: {
+      title: data.title,
+      content: data.content,
+    },
+  });
+  return updatedMemo ? {
+    ...updatedMemo,
+    createdAt: updatedMemo.createdAt.toISOString(),
+    updatedAt: updatedMemo.updatedAt.toISOString(),
+  } : null;
+};
+
+// メモの削除
+export const deleteMemo = async (id: string): Promise<boolean> => {
+  const deletedMemo = await db.memo.delete({
+    where: { id },
+  });
+  return deletedMemo !== null;
+};

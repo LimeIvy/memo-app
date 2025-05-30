@@ -4,6 +4,7 @@ import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { client } from '@/lib/hono';
+import { Button } from '@/components/ui/button';
 
 export default function EditMemo({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -127,15 +128,13 @@ export default function EditMemo({ params }: { params: Promise<{ id: string }> }
           />
         </div>
         
-        <button
+        <Button
           type="submit"
           disabled={submitting}
-          className={`bg-blue-500 text-white px-4 py-2 rounded ${
-            submitting ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
+          className="cursor-pointer"
         >
           {submitting ? '更新中...' : '更新する'}
-        </button>
+        </Button>
       </form>
     </div>
   );
